@@ -1,0 +1,18 @@
+`timescale 1ns / 1ps
+
+
+module priorityencoder(input i0,i1,i2,i3,output y0,y1);
+reg y1,y0;
+always@(i0,i1,i2,i3)begin
+    if(i3)
+     {y1,y0}=2'b11;
+    else if(i2)
+     {y1,y0}=2'b10;
+    else if(i1)
+     {y1,y0}=2'b01;
+    else if(i0)
+     {y1,y0}=2'b00;
+    else
+     {y1,y0}=2'bxx;
+    end
+endmodule
