@@ -1,0 +1,11 @@
+`timescale 1ns / 1ps
+
+
+module comparator_2(output g,l,e,input[1:0] a,b);
+
+
+assign g=(a>b);
+assign e=(a==b);
+assign l=(a<b);
+
+endmodule
