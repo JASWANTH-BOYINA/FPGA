@@ -1,0 +1,71 @@
+`timescale 1ns / 1ps
+
+module SERIALADDER_MEALEY(a,b,clk,rst,sum,cout);
+input a,b,clk,rst;
+output reg[3:0] sum;
+output reg cout;
+parameter c0=1'b0,c1=1'b1;
+reg temp;
+reg cst,nst;
+initial begin
+temp=0;
+sum=0;
+nst=c0;
+cst=nst;
+end
+always @(posedge clk or posedge rst)begin
+  if(rst)
+    temp=0;
+  else begin
+    if(cst==c0)
+      case({a,b})
+        2'b00:begin
+              temp=0;
+              nst=c0;
+              end
+        2'b01:begin
+              temp=1;
+              nst=c0;
+              end
+        2'b10:begin
+              temp=1;
+              nst=c0;
+              end
+        2'b11:begin
+              temp=0;
+              nst=c1;
+              end 
+        default:begin
+              temp=0;
+              nst=c0;
+              end
+      endcase
+    else
+      case({a,b})
+        2'b00:begin
+              temp=1;
+              nst=c0;
+              end
+        2'b01:begin
+              temp=0;
+              nst=c1;
+              end
+        2'b10:begin
+              temp=0;
+              nst=c1;
+              end
+        2'b11:begin
+              temp=1;
+              nst=c1;
+              end 
+        default:begin
+              temp=0;
+              nst=c0;
+              end
+      endcase         
+    end
+  cout<=nst;
+  sum<={sum[2:0],temp};
+  cst<=nst;
+end
+endmodule
