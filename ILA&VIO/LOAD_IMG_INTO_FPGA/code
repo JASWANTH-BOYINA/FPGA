@@ -1,0 +1,59 @@
+`timescale 1ns / 1ps
+
+
+module image_load (
+    input wire clk,
+    input wire rst,
+    input wire start,
+    output reg [7:0] out_pixel,
+    output reg out_valid
+);
+
+    reg [7:0] rom[0:63];  // 8x8 grayscale image
+    reg [7:0] row_buf[0:2][0:7];  // 3 rows of 8 pixels each
+    integer row = 0, col = 0, i;
+
+    reg [11:0] sum;
+
+    initial begin
+        $readmemh("image1.hex", rom);
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            row <= 0;
+            col <= 0;
+            out_pixel <= 0;
+            out_valid <= 0;
+        end else if (start) begin
+            // Shift rows and insert new pixels
+            row_buf[0][col] <= row_buf[1][col];
+            row_buf[1][col] <= row_buf[2][col];
+            row_buf[2][col] <= rom[row * 8 + col];
+
+            // Advance column
+            if (col < 7)
+                col <= col + 1;
+            else begin
+                col <= 0;
+                if (row < 7)
+                    row <= row + 1;
+                else
+                    row <= 0;
+            end
+
+            // Apply filter when window is ready
+            if (row >= 2 && col >= 2) begin
+                sum =  row_buf[0][col-2] + row_buf[0][col-1] + row_buf[0][col] +
+                       row_buf[1][col-2] + row_buf[1][col-1] + row_buf[1][col] +
+                       row_buf[2][col-2] + row_buf[2][col-1] + row_buf[2][col];
+
+                out_pixel <= sum / 9;
+                out_valid <= 1;
+            end else begin
+                out_valid <= 0;
+            end
+        end
+    end
+endmodule
+
