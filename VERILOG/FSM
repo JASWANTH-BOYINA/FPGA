@@ -1,0 +1,53 @@
+`timescale 1ns / 1ps
+
+
+module FSM(y,cstate,nstate,a,rst,clk);
+input a,rst,clk;
+output reg y;
+output reg[1:0] cstate,nstate;
+parameter s0=2'b00,s1=2'b01,s2=2'b10;
+integer i=0;
+initial begin 
+cstate=s0;
+nstate=cstate;
+end
+
+always @(posedge clk) begin
+   case(cstate)
+       s0: begin
+            if(a)
+              nstate=s1;           
+            else             
+              nstate=cstate;
+            y=0;
+           end
+       s1: begin
+            if(a)
+              nstate=cstate;
+            else
+              nstate=s2;
+            y=0;
+           end
+       s2: begin
+            if(a)
+              nstate=s0;
+            else
+              nstate=s0;
+            y=a;
+           end    
+       default: begin
+              cstate=s0;
+           end
+   endcase
+   if(y)
+     i=i+1;
+end
+   
+always@(posedge clk)begin
+  if(rst)
+    cstate<=s0; 
+  else
+    cstate=nstate;
+  end
+
+endmodule
