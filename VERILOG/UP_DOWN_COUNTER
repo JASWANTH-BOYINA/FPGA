@@ -1,0 +1,63 @@
+`timescale 1ns / 1ps
+
+module clock_divider#(parameter DIV_VALUE=25_000_000)(
+    input wire clk_in,    // original fast clock
+    input wire rst,       // synchronous reset
+    output reg clk_out    // divided slower clock
+);
+  
+    reg [31:0] counter = 0;
+    
+    always @(posedge clk_in or posedge rst) begin
+        if (rst) begin
+            counter <= 0;
+            clk_out <= 0;
+        end else begin
+            if (counter == DIV_VALUE-1) begin
+                counter <= 0;
+                clk_out <= ~clk_out;  // toggle output clock
+            end else begin
+                counter <= counter + 1;
+            end
+        end
+    end
+endmodule
+
+
+module ud_counter(clk,rst,count,enable);
+
+input clk,rst,enable;
+output reg[15:0] count;
+reg[3:0] i=0;
+wire clk_div50;
+
+
+localparam val=50_000_000;
+clock_divider #(.DIV_VALUE(val)) cd(.clk_in(clk),.rst(rst),.clk_out(clk_div50));
+always@(posedge clk_div50 or posedge rst)
+     if(rst)begin
+        i<=0;
+        count<=16'b0;
+     end
+     else
+        if(enable)
+           if(i>15)begin
+              i<=0;
+              count<=16'b0;
+           end
+           else begin
+              count<=1<<i;
+              i<=i+1;
+           end
+        else 
+           if(i<0) begin
+              i<=16;
+              count<=16'b0;
+              end
+           else begin
+              count<=16'h8000>>(15-i);
+              i<=i-1;
+              end
+
+
+endmodule
