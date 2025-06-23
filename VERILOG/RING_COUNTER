@@ -1,0 +1,38 @@
+`timescale 1ns / 1ps
+module clock_divider#(parameter DIV_VALUE=25_000_000)(
+    input wire clk_in,    // original fast clock
+    input wire rst,       // synchronous reset
+    output reg clk_out    // divided slower clock
+);
+
+    reg [31:0] counter = 0;
+    
+    always @(posedge clk_in or posedge rst) begin
+        if (rst) begin
+            counter <= 0;
+            clk_out <= 0;
+        end else begin
+            if (counter == DIV_VALUE-1) begin
+                counter <= 0;
+                clk_out <= ~clk_out;  // toggle output clock
+            end else begin
+                counter <= counter + 1;
+            end
+        end
+    end
+endmodule
+
+
+module RINGCOUNT(q,clk,preset,rst);
+input wire clk,preset,rst;
+output reg[3:0] q;
+initial
+q=4'b0001;
+clock_divider#(50_000_000) cd(clk,rst,clk_out);
+always@(posedge clk_out or posedge preset)begin
+  if(preset)
+    q=4'b0001;
+  else
+    q={q[2:0],q[3]};
+end
+endmodule
