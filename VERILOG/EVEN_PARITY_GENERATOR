@@ -1,0 +1,9 @@
+`timescale 1ns / 1ps
+
+
+module parity_evengen(a,b,c,peven,podd);
+input a,b,c;
+output peven,podd;
+assign peven=a^b^c;
+assign podd=!(a^b^c);
+endmodule
