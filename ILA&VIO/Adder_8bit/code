@@ -1,0 +1,33 @@
+`timescale 1ns / 1ps
+
+
+module adder8_vio(
+    input [7:0] a,
+    input [7:0] b,
+    input cin,
+    input enable,
+    input clk,
+    output carry,
+    output [7:0] sum
+    );
+c_addsub_1 your_instance_name (
+  .A(a),          // input wire [7 : 0] A
+  .B(b),          // input wire [7 : 0] B
+  .CLK(clk),      // input wire CLK
+  .ADD(enable),      // input wire ADD
+  .C_IN(1'b0),    // input wire C_IN
+  .C_OUT(carry),  // output wire C_OUT
+  .S(sum)          // output wire [7 : 0] S
+);
+ila_1 your_instance_name1 (
+	.clk(clk), // input wire clk
+
+
+	.probe0({carry,sum}) // input wire [8:0] probe0
+);
+vio_4 your_instance_name2 (
+  .clk(clk),                // input wire clk
+  .probe_in0({carry,sum}),    // input wire [8 : 0] probe_in0
+  .probe_out0({a,b,1'b0,enable})  // output wire [17 : 0] probe_out0
+);
+endmodule
