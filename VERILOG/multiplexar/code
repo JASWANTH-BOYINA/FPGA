@@ -1,0 +1,8 @@
+`timescale 1ns / 1ps
+
+module param_mux#(parameter width=8,n=4)(sel,out,in);
+input[$clog2(n)-1:0] sel; 
+output[width-1:0] out;
+input[width-1:0] in;
+
+endmodule
