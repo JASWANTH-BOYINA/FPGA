@@ -1,0 +1,71 @@
+`timescale 1ns / 1ps
+
+
+module matrix_mul(clk,cflat,done);
+input clk;
+output reg done;
+output[31:0] cflat;
+reg [7:0] c[0:3];
+wire[7:0] a,b[0:3];
+wire start,rst;
+wire[31:0] aflat,bflat;
+
+
+assign a[0]=aflat[7:0];
+assign a[1]=aflat[15:8];
+assign a[2]=aflat[23:16];
+assign a[3]=aflat[31:24];
+assign b[0]=bflat[7:0];
+assign b[1]=bflat[15:8];
+assign b[2]=bflat[23:16];
+assign b[3]=bflat[31:24];
+
+always@(posedge clk)begin
+    
+    
+    if(rst) begin
+       done<=0;
+       c[0]<=0;
+       c[1]<=0;
+       c[2]<=0;
+       c[3]<=0;   
+    end
+    
+    else if(start)begin
+            // Row 1
+            c[0] <= a[0]*b[0] + a[1]*b[2]; // c11
+            c[1] <= a[0]*b[1] + a[1]*b[3]; // c12
+            // Row 2
+            c[2] <= a[2]*b[0] + a[3]*b[2]; // c21
+            c[3] <= a[2]*b[1] + a[3]*b[3]; // c22
+            done <= 1;
+    end
+    
+    
+end
+
+assign cflat[7:0]=c[0];
+assign cflat[15:8]=c[1];
+assign cflat[23:16]=c[2];
+assign cflat[31:24]=c[3];
+    
+
+vio_matrix your_instance_name (
+  .clk(clk),                // input wire clk
+  .probe_in0(done),    // input wire [0 : 0] probe_in0
+  .probe_in1(cflat),    // input wire [31 : 0] probe_in1
+  .probe_out0(start),  // output wire [0 : 0] probe_out0
+  .probe_out1(rst),  // output wire [0 : 0] probe_out1
+  .probe_out2(aflat),  // output wire [31 : 0] probe_out2
+  .probe_out3(bflat)  // output wire [31 : 0] probe_out3
+);
+
+ila_matrix your_instance_name2 (
+	.clk(clk), // input wire clk
+
+
+	.probe0(done), // input wire [0:0]  probe0  
+	.probe1(cflat) // input wire [31:0]  probe1
+);
+
+endmodule
