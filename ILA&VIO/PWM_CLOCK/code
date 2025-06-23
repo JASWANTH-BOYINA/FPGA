@@ -1,0 +1,19 @@
+`timescale 1ns / 1ps
+
+
+module pwm(input clk,output reg led);
+wire set0,set1,rst;
+
+
+always@(posedge clk or posedge rst)begin
+    if(rst)
+       led<=0;
+    else
+       case({set1,set0}) 
+          2'b00: led<=0;
+          2'b01: led<=1;
+          2'b1x: led<=~led;
+          default:led<=0;
+       endcase
+   end
+endmodule
